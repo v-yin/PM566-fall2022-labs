@@ -38,12 +38,52 @@ summary(met$elev)
 summary(met$wind.sp)
 
 ```
-## replace 9999 with NA
+replace 9999 with NA
 ```{r}
 
 met[met$elev==9999.0] <- NA
 summary(met$elev)
 
 ```
+The highest elevation weather station is at `r max(met$elev, na.rm=TRUE)` meters
+Remove data with -40C
+```{r}
+met <- met[temp>-40]
+met2 <- met[order(temp)]
+head(met2)
+```
 
+#Step 5. Check with external source, delete any less than -15
+```{r}
+met <- met[temp>-15]
+met2 <- met[order(temp)]
+head(met2)
+```
+#Step 6. Compute summary statistics
+```{r}
+met[elev==max(elev, na.rm=TRUE), summary(wind.sp)]
+met[elev==max(elev, na.rm=TRUE), summary(temp)]
+```
+```{r}
+met[elev==max(elev, na.rm=TRUE), .(
+  temp_wind = cor(temp, wind.sp, use = "complete"),
+  temp_hour = cor(temp, hour, use = "complete"),
+  wind.sp_day = cor(wind.sp, day, use = "complete"),
+  wind.sp_hour = cor(wind.sp, hour, use= "complete")
+)]
+```
+#Step 7. Exploratory graphs. Look at key variables
+```{r}
+hist(met$elev, breaks=100)
+hist(met$temp)
+hist(met$wind.sp)
+elev <- met[elev==max(elev)]
+summary(elev)
+```
+```{r}
+library(leaflet)
+leaflet(elev) %>%
+  addProviderTiles('OpenStreetMap') %>% 
+  addCircles(lat=~lat,lng=~lon, opacity=1, fillOpacity=1, radius=100)
+```
 
