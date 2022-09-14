@@ -1,0 +1,78 @@
+---
+title: "Lab04"
+author: "VY"
+date: "`r Sys.Date()`"
+output: html_document
+---
+Download file if needed and remove any temp less than -17 and look for key missing data. No 9999 in dew point or wind speed.
+```{r setup, include=FALSE}
+if (!file.exists("met_all.gz"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
+    destfile = "met_all.gz",
+    method   = "libcurl",
+    timeout  = 60
+    )
+met <- data.table::fread("../Lab04/met_all.gz")
+
+met <- met[temp>-17][elev == 9999.0, elev := NA]
+
+str(met)
+
+summary(met$elev)
+summary(met$temp)
+summary(met$dew.point)
+summary(met$wind.sp)
+
+library(tidyverse)
+library(data.table)
+```
+
+
+New date column, keep only first week data
+```{r}
+met <- met[ , ymd := as.Date(paste(year, month, day, sep= "-"))]
+table(met$ymd)
+met[, table(week(ymd))]
+met <- met[week(ymd)==31]
+nrow(met)
+```
+
+Compute the mean by station of the variables temp, rh, wind.sp, vis.dist, dew.point, lat, lon, and elev. (no 9999s)
+```{r}
+met[, .(
+  temp = max(temp),
+  rh = max(rh, na.rm=T),
+  wind.sp = max(wind.sp, na.rm=T),
+  vis.dist = max(vis.dist, na.rm=T),
+  dew.point = max(dew.point, na.rm=T),
+  lat = max(lat),
+  lon = max(lon),
+  elev = max(elev, na.rm=T)
+)]
+```
+
+```{r}
+met_avg <- met[, .(
+  temp = mean(temp),
+  rh = mean(rh, na.rm=T),
+  wind.sp = mean(wind.sp, na.rm=T),
+  vis.dist = mean(vis.dist, na.rm=T),
+  dew.point = mean(dew.point, na.rm=T),
+  lat = mean(lat),
+  lon = mean(lon),
+  elev = mean(elev, na.rm=T)
+), by = "USAFID"]
+head(met_avg)
+```
+
+Create a region variable for NW, SW, NE, SE based on lon = -98.00 and lat = 39.71 degrees
+```{r}
+
+```
+
+Create a categorical variable for elevation as in the lecture slides
+```{r}
+
+```
+
