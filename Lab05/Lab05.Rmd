@@ -1,0 +1,79 @@
+---
+title: "Lab05"
+author: "VY"
+date: '`r Sys.Date()`'
+output: github_document
+always_allow_html: true 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r read-data install packages, cache=T}
+
+webshot::install_phantomjs()
+library(leaflet)
+library(webshot)
+library(data.table)
+library(dtplyr)
+library(dplyr)
+
+if (!file.exists("met_all.gz"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/02_met/met_all.gz",
+    destfile = "met_all.gz",
+    method   = "libcurl",
+    timeout  = 60
+    )
+met <- data.table::fread("../Lab04/met_all.gz")
+met <- met[temp>-17][elev == 9999.0, elev := NA]
+```
+
+```{r read in new station data, cache=T}
+# Download the data
+stations <- fread("ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv")
+stations[, USAF := as.integer(USAF)]
+
+# Dealing with NAs and 999999
+stations[, USAF   := fifelse(USAF == 999999, NA_integer_, USAF)]
+stations[, CTRY   := fifelse(CTRY == "", NA_character_, CTRY)]
+stations[, STATE  := fifelse(STATE == "", NA_character_, STATE)]
+
+# Selecting the three relevant columns, and keeping unique records
+stations <- unique(stations[, list(USAF, CTRY, STATE)])
+
+# Dropping NAs
+stations <- stations[!is.na(USAF)]
+
+# Removing duplicates
+stations[, n := 1:.N, by = .(USAF)]
+stations <- stations[n == 1,][, n := NULL]
+```
+
+```{r merge data}
+met <- merge(
+  x = met,
+  y = stations,
+  by.x = "USAFID",
+  by.y = "USAF",
+  all.x = TRUE,
+  all.y = FALSE
+)
+```
+
+#What is the median station in terms of temperature, wind speed, and atmospheric pressure? Look for the three weather stations that best represent continental US using the quantile() function. Do these three coincide?
+```{r mean median country}
+station_averages <- 
+  met[ , .(
+    temp=mean(temp, na.rm=T),
+    wind.sp=mean(wind.sp, na.rm=T),
+    atm.press=mean(atm.press, na.rm=T)
+  ), by = "USAFID"]
+stat_medians <- station_averages[ , .(
+    temp50 =median(temp, na.rm=T),
+    wind.sp50 =median(wind.sp, na.rm=T),
+    atm.press50 =median(atm.press, na.rm=T)
+  )]
+station_averages[ , temp_dist50 := abs(temp - stat_medians$temp50)][order(temp_dist50)]
+```
