@@ -76,4 +76,37 @@ stat_medians <- station_averages[ , .(
     atm.press50 =median(atm.press, na.rm=T)
   )]
 station_averages[ , temp_dist50 := abs(temp - stat_medians$temp50)][order(temp_dist50)]
+station_averages[which.min(temp_dist50)]
 ```
+
+#Just like the previous question, you are asked to identify what is the most representative, the median, station per state. This time, instead of looking at one variable at a time, look at the euclidean distance. If multiple stations show in the median, select the one located at the lowest latitude.
+
+```{r most representative state}
+state_averages <- 
+  met[ , .(
+    temp=mean(temp, na.rm=T),
+    wind.sp=mean(wind.sp, na.rm=T),
+    atm.press=mean(atm.press, na.rm=T)
+  ), by = .(USAFID,STATE)]
+state_medians <- state_averages[ , .(
+    temp50 =median(temp, na.rm=T),
+    wind.sp50 =median(wind.sp, na.rm=T),
+    atm.press50 =median(atm.press, na.rm=T)
+  ), by = STATE]
+
+statemerge <-merge( 
+  x = state_averages,
+  y=state_medians,
+  by.x = "STATE",
+  by.y = "STATE",
+  all.x=TRUE,
+  all.y=FALSE)
+
+station_averages[ , tempstatedist_50 := temp - statemerge$temp50]
+station_averages[ , windstatedist_50 := wind.sp - statemerge$wind.sp50]
+station_averages[ , eucdist := tempstatedist_50^2 + windstatedist_50^2 ]
+
+station_averages[ which.min(eucdist)]
+                    
+```
+Station 726625
