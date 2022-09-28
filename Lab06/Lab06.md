@@ -32,6 +32,21 @@ mts <- as_tibble(mtsamples)
 ## What specialties do we have? What are the frequencies of each?
 
 ``` r
+library(dplyr)
+```
+
+    ## 
+    ## Attaching package: 'dplyr'
+
+    ## The following objects are masked from 'package:stats':
+    ## 
+    ##     filter, lag
+
+    ## The following objects are masked from 'package:base':
+    ## 
+    ##     intersect, setdiff, setequal, union
+
+``` r
 specialties <- count(mts, medical_specialty)
 
 specialties %>%
@@ -89,6 +104,8 @@ ie Consult - History and Physical and Discharge Summary are not
 specialty-specific.
 
 ``` r
+library(ggplot2)
+library(forcats)
 specialties %>% 
   top_n(10) %>%
   ggplot(aes(x=n, y= fct_reorder(medical_specialty, n))) +
@@ -99,3 +116,32 @@ specialties %>%
 
 ![](Lab06_files/figure-gfm/graph%20specialties-1.png)<!-- --> \##
 Tokenize words in transcription and look at top 20
+
+``` r
+mts %>%
+  unnest_tokens(word, transcription) %>%
+  count(word, sort=TRUE) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x=n, y=fct_reorder(word, n))) +
+  geom_col()
+```
+
+![](Lab06_files/figure-gfm/tokenize-1.png)<!-- --> There are a lot of
+stop words here. The top word is “the” while we do see “patient”. We
+should get rid of the stop words.
+
+## Remove stop words
+
+``` r
+mts %>%
+  unnest_tokens(word, transcription) %>%
+  count(word, sort=TRUE) %>%
+  anti_join(stop_words, by = c("word")) %>%
+  filter(!grepl(pattern = "^[0-9]+$", x=word)) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x=n, y=fct_reorder(word, n))) +
+  geom_col()
+```
+
+![](Lab06_files/figure-gfm/remove%20stopwords-1.png)<!-- --> These look
+more likel medical terms. Numbers were removed from the list of words.
