@@ -1,0 +1,33 @@
+---
+title: "Lab05"
+author: "VY"
+date: '`r Sys.Date()`'
+output: github_document
+always_allow_html: true 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r set up packages, cache = TRUE}
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(tidytext)
+library(tidyverse)
+library(dtplyr)
+```
+## Read in data
+```{r read data, cache=TRUE}
+if (!file.exists("mtsamples.csv"))
+  download.file(
+    url = "https://raw.githubusercontent.com/USCbiostats/data-science-data/master/00_mtsamples/mtsamples.csv",
+    destfile = "mtsamples.csv",
+    method   = "libcurl",
+    timeout  = 60
+    )
+mtsamples <- read.csv("mtsamples.csv")
+mts <- as_tibble(mtsamples)
+```
+
