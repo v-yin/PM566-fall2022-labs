@@ -33,20 +33,6 @@ mts <- as_tibble(mtsamples)
 
 ``` r
 library(dplyr)
-```
-
-    ## 
-    ## Attaching package: 'dplyr'
-
-    ## The following objects are masked from 'package:stats':
-    ## 
-    ##     filter, lag
-
-    ## The following objects are masked from 'package:base':
-    ## 
-    ##     intersect, setdiff, setequal, union
-
-``` r
 specialties <- count(mts, medical_specialty)
 
 specialties %>%
@@ -145,3 +131,70 @@ mts %>%
 
 ![](Lab06_files/figure-gfm/remove%20stopwords-1.png)<!-- --> These look
 more likel medical terms. Numbers were removed from the list of words.
+
+## Repeat question 2, but this time tokenize into bi-grams. how does the result change if you look at tri-grams?
+
+``` r
+mts %>%
+  unnest_ngrams(bigram, transcription, n=2) %>%
+  count(bigram, sort=TRUE) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x=n, y=fct_reorder(bigram, n))) +
+  geom_col()
+```
+
+![](Lab06_files/figure-gfm/bigrams-1.png)<!-- --> “The patient” was the
+top bigram. There are a lot of non-interesting bigrams (of the, in the).
+
+``` r
+mts %>%
+  unnest_ngrams(trigram, transcription, n=3) %>%
+  count(trigram, sort=TRUE) %>%
+  top_n(20, n) %>%
+  ggplot(aes(x=n, y=fct_reorder(trigram, n))) +
+  geom_col()
+```
+
+![](Lab06_files/figure-gfm/trigrams-1.png)<!-- --> Top 20 trigrams seem
+more medical.
+
+## Using the results you got from questions 4. Pick a word and count the words that appears after and before it.
+
+``` r
+ptbigram <- 
+  mts %>%
+  unnest_ngrams(bigram, transcription, n=2) %>%
+  separate(bigram, into = c("word1", "word2"), sep = " ") %>%
+  select(word1, word2) %>%
+  filter(word1 == "patient" | word2 == "patient")
+```
+
+Words appearing before patient
+
+``` r
+ptbigram %>%
+  filter(word2 == "patient") %>%
+  count(word1, sort=TRUE) %>%
+  anti_join(stop_words, by = c("word1" = "word")) %>%
+  top_n(10, n) %>%
+  ggplot(aes(x=n, y=fct_reorder(word1, n))) +
+  geom_col()
+```
+
+![](Lab06_files/figure-gfm/bigrams%20before%20patient-1.png)<!-- -->
+Words appearing after patient
+
+``` r
+ptbigram %>%
+  filter(word1 == "patient") %>%
+  count(word2, sort=TRUE) %>%
+  anti_join(stop_words, by = c("word2" = "word")) %>%
+  top_n(10, n) %>%
+  ggplot(aes(x=n, y=fct_reorder(word2, n))) +
+  geom_col()
+```
+
+![](Lab06_files/figure-gfm/bigrams%20after%20patient-1.png)<!-- -->
+Looks reasonable!
+
+## Which words are most used in each of the specialties. you can use group_by() and top_n() from dplyr to have the calculations be done within each specialty. Remember to remove stopwords. How about the most 5 used words?
