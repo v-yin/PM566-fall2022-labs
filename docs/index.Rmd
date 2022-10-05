@@ -20,4 +20,29 @@ library(forcats)
 library(utils)
 library(xml2)
 library(rvest)
+library(httr)
 ```
+
+# Question 1: How many sars-cov-2 papers?
+```{r download website and extract data, cache=TRUE}
+# Downloading the website
+website <- xml2::read_html("https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2")
+
+# Finding the counts
+counts <- xml2::xml_find_first(website, "/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]/span")
+
+# Turning it into text
+counts <- as.character(counts)
+
+# Extracting the data using regex
+stringr::str_extract(counts, "[0-9,.]+")
+```
+
+```{r}
+
+```
+
+
+
+
+

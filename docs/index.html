@@ -370,49 +370,33 @@ pre code {
 </div>
 
 
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>library(data.table)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;data.table&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     between, first, last</code></pre>
-<pre class="r"><code>library(ggplot2)
+<pre class="r"><code>library(dplyr)
+library(data.table)
+library(ggplot2)
 library(tidytext)
-library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages
-## ───────────────────────────────────────
-## tidyverse 1.3.2 ──</code></pre>
-<pre><code>## ✔ tibble  3.1.8     ✔ purrr   0.3.4
-## ✔ tidyr   1.2.0     ✔ stringr 1.4.1
-## ✔ readr   2.1.2     ✔ forcats 0.5.2
-## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ data.table::between() masks dplyr::between()
-## ✖ dplyr::filter()       masks stats::filter()
-## ✖ data.table::first()   masks dplyr::first()
-## ✖ dplyr::lag()          masks stats::lag()
-## ✖ data.table::last()    masks dplyr::last()
-## ✖ purrr::transpose()    masks data.table::transpose()</code></pre>
-<pre class="r"><code>library(dtplyr)
+library(tidyverse)
+library(dtplyr)
 library(knitr)
 library(forcats)
 library(utils)
 library(xml2)
-library(rvest)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;rvest&#39;
-## 
-## The following object is masked from &#39;package:readr&#39;:
-## 
-##     guess_encoding</code></pre>
+library(rvest)
+library(httr)</code></pre>
+<div id="question-1-how-many-sars-cov-2-papers" class="section level1">
+<h1>Question 1: How many sars-cov-2 papers?</h1>
+<pre class="r"><code># Downloading the website
+website &lt;- xml2::read_html(&quot;https://pubmed.ncbi.nlm.nih.gov/?term=sars-cov-2&quot;)
+
+# Finding the counts
+counts &lt;- xml2::xml_find_first(website, &quot;/html/body/main/div[9]/div[2]/div[2]/div[1]/div[1]/span&quot;)
+
+# Turning it into text
+counts &lt;- as.character(counts)
+
+# Extracting the data using regex
+stringr::str_extract(counts, &quot;[0-9,.]+&quot;)</code></pre>
+<pre><code>## [1] &quot;179,021&quot;</code></pre>
+</div>
 
 
 
