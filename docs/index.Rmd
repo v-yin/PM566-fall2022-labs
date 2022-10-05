@@ -1,0 +1,23 @@
+---
+title: "Lab07"
+author: "VY"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r set up packages, cache = TRUE}
+library(dplyr)
+library(data.table)
+library(ggplot2)
+library(tidytext)
+library(tidyverse)
+library(dtplyr)
+library(knitr)
+library(forcats)
+library(utils)
+library(xml2)
+library(rvest)
+```
