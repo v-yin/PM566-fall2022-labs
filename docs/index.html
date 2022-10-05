@@ -397,6 +397,46 @@ counts &lt;- as.character(counts)
 stringr::str_extract(counts, &quot;[0-9,.]+&quot;)</code></pre>
 <pre><code>## [1] &quot;179,021&quot;</code></pre>
 </div>
+<div id="question-2-academic-publications-on-covid19-and-hawaii" class="section level1">
+<h1>Question 2: Academic publications on COVID19 and Hawaii</h1>
+<pre class="r"><code>library(httr)
+query_ids &lt;- GET(
+  url   = &quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi&quot;,
+  query = list(
+    db = &quot;pubmed&quot;,
+    term = &quot;covid19 hawaii&quot;,
+    retmax = 1000
+  )
+)
+
+# Extracting the content of the response of GET
+ids &lt;- httr::content(query_ids)</code></pre>
+</div>
+<div id="question-3-get-details-about-the-articles" class="section level1">
+<h1>Question 3: Get details about the articles</h1>
+<pre class="r"><code># Turn the result into a character vector
+ids &lt;- as.character(ids)
+
+# Find all the ids 
+ids &lt;- stringr::str_extract_all(ids, &quot;&lt;Id&gt;[[:digit:]]+&lt;/Id&gt;&quot;)[[1]]
+
+# Remove all the leading and trailing &lt;Id&gt; &lt;/Id&gt;. Make use of &quot;|&quot;
+ids &lt;- stringr::str_remove_all(ids, &quot;&lt;/?Id&gt;&quot;)
+
+#publications &lt;- GET(
+ # url   = &quot;https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi&quot;,
+  #query = list(
+   # db = &quot;pubmed&quot;,
+    #id = ,
+    #retmax = 1000,
+    #rettype = &quot;abstract&quot;
+    #)
+#)
+
+# Turning the output into character vector
+#publications &lt;- httr::content(publications)
+#publications_txt &lt;- as.character(publications)</code></pre>
+</div>
 
 
 
