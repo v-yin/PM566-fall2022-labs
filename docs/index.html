@@ -415,12 +415,13 @@ ids &lt;- httr::content(query_ids)</code></pre>
 <div id="question-3-get-details-about-the-articles" class="section level1">
 <h1>Question 3: Get details about the articles</h1>
 <pre class="r"><code># Turn the result into a character vector
-ids &lt;- as.character(ids)
+# ids &lt;- as.character(ids)
 
 # Find all the ids 
-ids &lt;- stringr::str_extract_all(ids, &quot;&lt;Id&gt;[[:digit:]]+&lt;/Id&gt;&quot;)[[1]]
-
-# Remove all the leading and trailing &lt;Id&gt; &lt;/Id&gt;. Make use of &quot;|&quot;
+ids &lt;- stringr::str_extract_all(ids, &quot;&lt;Id&gt;[[:digit:]]+&lt;/Id&gt;&quot;)[[1]]</code></pre>
+<pre><code>## Warning in stri_extract_all_regex(string, pattern, simplify = simplify, :
+## argument is not an atomic vector; coercing</code></pre>
+<pre class="r"><code># Remove all the leading and trailing &lt;Id&gt; &lt;/Id&gt;. Make use of &quot;|&quot;
 ids &lt;- stringr::str_remove_all(ids, &quot;&lt;/?Id&gt;&quot;)
 
 #publications &lt;- GET(
@@ -435,7 +436,7 @@ ids &lt;- stringr::str_remove_all(ids, &quot;&lt;/?Id&gt;&quot;)
 
 # Turning the output into character vector
 #publications &lt;- httr::content(publications)
-#publications_txt &lt;- as.character(publications)</code></pre>
+#publications_txt &lt;- as.character(publications) </code></pre>
 </div>
 
 
