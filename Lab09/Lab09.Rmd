@@ -1,0 +1,40 @@
+---
+title: "Lab09"
+author: "VY"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 2
+
+```{r}
+set.seed(3000)
+fun1 <- function(n = 100, k = 4, lambda = 4) {
+  x <- NULL
+  
+  for (i in 1:n)
+    x <- rbind(x, rpois(k, lambda))
+  
+  return(x)
+}
+
+f1 <-fun1(1000,4)
+mean(f1)
+
+fun1alt <- function(n = 100, k = 4, lambda = 4) {
+  # YOUR CODE HERE
+  
+}
+
+# Benchmarking
+microbenchmark::microbenchmark(
+  fun1(),
+  fun1alt()
+)
+```
+
+
