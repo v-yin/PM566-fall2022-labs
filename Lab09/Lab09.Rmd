@@ -27,8 +27,11 @@ mean(f1)
 
 fun1alt <- function(n = 100, k = 4, lambda = 4) {
   # YOUR CODE HERE
+  x <- matrix( rpois(n*k, lambda) , ncol=4)
   
+  return(x)
 }
+f1 <- fun1alt(50000,4)
 
 # Benchmarking
 microbenchmark::microbenchmark(
@@ -37,4 +40,7 @@ microbenchmark::microbenchmark(
 )
 ```
 
+```{r}
+
+```
 
