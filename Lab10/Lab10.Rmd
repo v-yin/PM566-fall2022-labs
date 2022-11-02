@@ -11,6 +11,11 @@ always_allow_html: true
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(repos = c(CRAN = "http://cran.rstudio.com")) #install packages when knitting
+
+# check if packages installed yet
+if(!require(RSQLite)) install.packages("RSQLite")
+if(!require(DBI)) install.packages("DBI")
 
 library(RSQLite)
 library(DBI)
@@ -43,10 +48,10 @@ PRAGMA table_info(actor)
 ## Exercise 1
 Retrive the actor ID, first name and last name for all actors using the actor table. Sort by last name and then by first name.
 
-```{r exercise 1}
-dbGetQuery(con, "SELECT actor_id, first_name, last_name
+```{sql, connection=con}
+SELECT actor_id, first_name, last_name
 FROM actor
-ORDER by last_name, first_name")
+ORDER by last_name, first_name
 ```
 
 Exercise 2
@@ -56,7 +61,33 @@ Retrive the actor ID, first name, and last name for actors whose last name equal
 SELECT actor_id, first_name, last_name
 FROM actor
 WHERE last_name IN ('WILLIAMS', 'DAVIS')
+ORDER by last_name, first_name
 ```
+
+Exercise 3
+Write a query against the rental table that returns the IDs of the customers who rented a film on July 5, 2005 (use the rental.rental_date column, and you can use the date() function to ignore the time component). Include a single row for each distinct customer ID.
+```{sql connection=con}
+SELECT DISTINCT rental_id
+FROM rental
+WHERE date(rental_date) = '2005-07-05'
+```
+
+Exercise 4.1
+Construct a query that retrives all rows from the payment table where the amount is either 1.99, 7.99, 9.99.
+```{sql connection=con}
+SELECT *
+FROM payment
+WHERE amount IN (1.99, 7.99, 9.99)
+```
+Exercise 4.2
+Construct a query that retrives all rows from the payment table where the amount is greater then 5
+```{sql connection=con}
+SELECT *
+FROM payment
+WHERE amount > 5
+```
+
+
 ```{r clean up}
 # clean up
 dbDisconnect(con)
